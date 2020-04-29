@@ -22,7 +22,7 @@ workTypeDict = {
 }
 
 
-def uploadToS3():
+def uploadToS3(countRecords):
     s3_client = boto3.client('s3')
     filePath = datetime.now().strftime('%Y-%m-%d') + '-ir-export.csv'
     if os.path.isfile(filePath):
@@ -32,7 +32,7 @@ def uploadToS3():
             os.remove(filePath)
         except ClientError as e:
             return {'message':'unable to upload to s3. Check log for more information.'}
-        return {'message': 'File: ' + filePath + ' has been uploaded to S3.'}
+        return {'message': 'Total: ' + str(countRecords) + ' records has been exported. File: ' + filePath + ' has been uploaded to S3.'}
     else:
         return {'message': 'File is not exits'}
 @task()
@@ -88,5 +88,4 @@ def runExport():
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
         csvwriter.writerows(rows)
-    print('Done. Total: ' + str(countRecords) + ' records has been exported.')
-    return uploadToS3()
+    return uploadToS3(countRecords)
