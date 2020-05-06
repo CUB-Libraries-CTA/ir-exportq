@@ -28,7 +28,7 @@ def uploadToS3(countRecords):
     if os.path.isfile(filePath):
         try:
             response = s3_client.upload_file(
-                filePath, 'cubl-ir-reports', filePath)
+                filePath, 'cubl-ir-reports', '/' + filePath)
             os.remove(filePath)
         except ClientError as e:
             return {'message': 'unable to upload to s3. Check log for more information.'}
