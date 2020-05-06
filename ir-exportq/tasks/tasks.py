@@ -28,23 +28,26 @@ def uploadToS3(countRecords):
     if os.path.isfile(filePath):
         try:
             response = s3_client.upload_file(
-                filePath, 'cubl-ir-bepress', "ir-exports/" + filePath)
+                filePath, 'cubl-ir-reports', filePath)
             os.remove(filePath)
         except ClientError as e:
-            return {'message':'unable to upload to s3. Check log for more information.'}
+            return {'message': 'unable to upload to s3. Check log for more information.'}
         return {'message': 'Total: ' + str(countRecords) + ' records has been exported. File: ' + filePath + ' has been uploaded to S3.'}
     else:
         return {'message': 'File is not exits'}
+
+
 @task()
 def runExport():
     url = 'https://scholar.colorado.edu/catalog.json?per_page=100&q=&search_field=all_fields'
     initPage = url + '&page=1'
-    total_pages = requests.get(initPage).json()['response']['pages']['total_pages']
+    total_pages = requests.get(initPage).json()[
+        'response']['pages']['total_pages']
     fields = ['Title', 'Academic Affilation', 'Resource Type', 'URL']
     rows = []
     links = []
     fileName = datetime.now().strftime('%Y-%m-%d') + '-ir-export.csv'
-    countRecords = 0;
+    countRecords = 0
     for pageNumber in range(total_pages):
         pageNumber = pageNumber + 1
         pageURL = url + '&page=' + str(pageNumber)
@@ -72,12 +75,13 @@ def runExport():
 
             try:
                 if 'Collection' in doc['has_model_ssim']:
-                    link = 'https://scholar.colorado.edu/collections/' + doc['id']
+                    link = 'https://scholar.colorado.edu/collections/' + \
+                        doc['id']
                 else:
                     works = doc['has_model_ssim']
                     for work in works:
                         links.append('https://scholar.colorado.edu/concern/' +
-                                    workTypeDict[work] + '/' + doc['id'])
+                                     workTypeDict[work] + '/' + doc['id'])
                     link = ', '.join(links)
             except:
                 link = 'error'
