@@ -8,6 +8,10 @@ import boto3
 import os
 from botocore.exceptions import ClientError
 
+# The S3 bucket the report will be uploaded to 
+s3_destination_bucket = os.getenv("IR_REPORT_S3_BUCKET", "cubl-ir-reports-test")
+
+
 workTypeDict = {
     'GraduateThesisOrDissertation': 'graduate_thesis_or_dissertations',
     'UndergraduateHonorsThesis': 'undergraduate_honors_theses',
@@ -28,7 +32,7 @@ def uploadToS3(countRecords):
     if os.path.isfile(filePath):
         try:
             response = s3_client.upload_file(
-                filePath, 'cubl-ir-reports', filePath)
+                filePath, s3_destination_bucket, filePath)
             os.remove(filePath)
         except ClientError as e:
             return {'message': 'unable to upload to s3. Check log for more information.'}
