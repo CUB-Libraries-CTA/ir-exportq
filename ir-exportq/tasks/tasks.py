@@ -59,7 +59,6 @@ def runExport():
     links = []
     fileName = datetime.now().strftime('%Y-%m-%d') + '-ir-export.csv'
     countRecords = 0
-    """
     for pageNumber in range(total_pages):
         pageNumber = pageNumber + 1
         pageURL = url + '&page=' + str(pageNumber)
@@ -106,5 +105,3 @@ def runExport():
         csvwriter.writerow(fields)
         csvwriter.writerows(rows)
     return uploadToS3(countRecords)
-    """
-    return {'message': 'Testing'}
