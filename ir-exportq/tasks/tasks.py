@@ -12,7 +12,7 @@ from botocore.exceptions import ClientError
 S3_DESTINATION_BUCKET = os.getenv("S3_BUCKET_IR_REPORT", "cubl-ir-reports-test")
 
 # The url for the Scholar app (without the ending '/')
-SCHOLAR_URL = os.getenv("SCHOLAR_URL", "https://test-scholar.colorado.edu")
+SCHOLAR_URL = os.getenv("SCHOLAR_URL", "https://scholar.colorado.edu")
 
 
 workTypeDict = {
