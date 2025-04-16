@@ -9,7 +9,7 @@ import os
 from botocore.exceptions import ClientError
 
 # The S3 bucket the report will be uploaded to 
-S3_DESTINATION_BUCKET = os.getenv("S3_BUCKET_IR_REPORT", "cubl-ir-reports-test")
+S3_DESTINATION_BUCKET = os.getenv("S3_BUCKET_IR_REPORT", "cubl-ir-reports")
 
 # The url for the Scholar app (without the ending '/')
 SCHOLAR_URL = os.getenv("SCHOLAR_URL", "https://scholar.colorado.edu")
