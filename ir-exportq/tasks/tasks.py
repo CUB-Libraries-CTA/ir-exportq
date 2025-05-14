@@ -8,6 +8,13 @@ import boto3
 import os
 from botocore.exceptions import ClientError
 
+# The S3 bucket the report will be uploaded to 
+S3_DESTINATION_BUCKET = os.getenv("S3_BUCKET_IR_REPORT", "cubl-ir-reports")
+
+# The url for the Scholar app (without the ending '/')
+SCHOLAR_URL = os.getenv("SCHOLAR_URL", "https://scholar.colorado.edu")
+
+
 workTypeDict = {
     'GraduateThesisOrDissertation': 'graduate_thesis_or_dissertations',
     'UndergraduateHonorsThesis': 'undergraduate_honors_theses',
@@ -28,7 +35,7 @@ def uploadToS3(countRecords):
     if os.path.isfile(filePath):
         try:
             response = s3_client.upload_file(
-                filePath, 'cubl-ir-reports', filePath)
+                filePath, S3_DESTINATION_BUCKET, filePath)
             os.remove(filePath)
         except ClientError as e:
             return {'message': 'unable to upload to s3. Check log for more information.'}
@@ -39,10 +46,14 @@ def uploadToS3(countRecords):
 
 @task()
 def runExport():
-    url = 'https://scholar.colorado.edu/catalog.json?per_page=100&q=&search_field=all_fields'
+    #url = 'https://scholar.colorado.edu/catalog.json?per_page=100&q=&search_field=all_fields'
+    url = SCHOLAR_URL + '/catalog.json?per_page=100&q=&search_field=all_fields'
     initPage = url + '&page=1'
-    total_pages = requests.get(initPage).json()[
-        'response']['pages']['total_pages']
+    response = requests.get(initPage)
+    print(response.status_code)
+    print(response.text)
+    total_pages = response.json()['response']['pages']['total_pages']
+    print(total_pages)
     fields = ['Title', 'Academic Affilation', 'Resource Type', 'URL']
     rows = []
     links = []
@@ -75,12 +86,13 @@ def runExport():
 
             try:
                 if 'Collection' in doc['has_model_ssim']:
-                    link = 'https://scholar.colorado.edu/collections/' + \
-                        doc['id']
+                    #link = 'https://scholar.colorado.edu/collections/' + \
+                    link = SCHOLAR_URL + '/collections/' + doc['id']
                 else:
                     works = doc['has_model_ssim']
                     for work in works:
-                        links.append('https://scholar.colorado.edu/concern/' +
+                        #links.append('https://scholar.colorado.edu/concern/' +
+                        links.append(SCHOLAR_URL + '/concern/' +
                                      workTypeDict[work] + '/' + doc['id'])
                     link = ', '.join(links)
             except:
