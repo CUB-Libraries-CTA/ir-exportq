@@ -1,4 +1,5 @@
-from celery.task import task
+from celery import Celery
+import celeryconfig
 import json
 import requests
 import csv
@@ -14,6 +15,8 @@ S3_DESTINATION_BUCKET = os.getenv("S3_BUCKET_IR_REPORT", "cubl-ir-reports")
 # The url for the Scholar app (without the ending '/')
 SCHOLAR_URL = os.getenv("SCHOLAR_URL", "https://scholar.colorado.edu")
 
+app = Celery()
+app.config_from_object(celeryconfig)
 
 workTypeDict = {
     'GraduateThesisOrDissertation': 'graduate_thesis_or_dissertations',
@@ -44,7 +47,7 @@ def uploadToS3(countRecords):
         return {'message': 'File is not exits'}
 
 
-@task()
+@app.task()
 def runExport():
     #url = 'https://scholar.colorado.edu/catalog.json?per_page=100&q=&search_field=all_fields'
     url = SCHOLAR_URL + '/catalog.json?per_page=100&q=&search_field=all_fields'
